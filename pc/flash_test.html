@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Latency flash test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; cursor: none; user-select: none; }
+  #hint { position: fixed; bottom: 16px; left: 16px; color: #444; font: 14px system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<div id="hint">Put the sensor anywhere on this page. Press F for fullscreen. Mouse down = white, mouse up = black.</div>
+<script>
+  // Turns the whole page white the moment a mouse button goes down, black when it comes up.
+  // Measures the browser + OS + GPU + monitor path. Fullscreen gives the most consistent numbers.
+  const set = c => { document.body.style.background = c; };
+  addEventListener('mousedown', e => { if (e.button === 0) set('#fff'); });
+  addEventListener('mouseup',   e => { if (e.button === 0) set('#000'); });
+  addEventListener('contextmenu', e => e.preventDefault());
+  addEventListener('keydown', e => {
+    if (e.key === 'f' || e.key === 'F') {
+      document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+      document.getElementById('hint').style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>
