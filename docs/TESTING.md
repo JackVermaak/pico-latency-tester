@@ -43,6 +43,14 @@ This writes `vsync.md` (a Markdown table) and `vsync.png` (a chart).
 | 5 | Frame cap | `cs2 fps unlimited`, `cs2 fps 120`, `cs2 fps 60` | Latency vs frame rate |
 | 6 | Macropad impact | `cs2 pad unplugged`, `cs2 pad plugged + app` | Whether the Pico Mixpad adds input lag |
 
+**Flash tests (1, 2), automated (Windows):** `pc/auto_flash.py` opens its own full-screen window,
+centres the cursor, runs the tester, and can switch the main monitor's refresh rate for the run:
+
+```
+py pc/auto_flash.py COM5 --hz 240 --label "flash 240hz run1"
+py pc/auto_flash.py COM5 --hz 60 --label auto          # label becomes "flash 60hz"
+```
+
 **Browser tests (1, 2):** open `pc/flash_test.html`, press F for fullscreen, place the sensor in
 the centre of the screen. Change the refresh rate in Windows Settings → Display → Advanced display.
 
