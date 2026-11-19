@@ -1,0 +1,51 @@
+name: release
+
+# Push a tag like v1.0 to compile the firmware and publish a GitHub Release
+# with the .uf2 and the case STLs.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+
+      - name: Install core and libraries
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+          arduino-cli core update-index
+          arduino-cli core install rp2040:rp2040
+          arduino-cli lib install "Adafruit SSD1306" "Adafruit GFX Library"
+
+      - name: Compile firmware
+        run: |
+          arduino-cli compile \
+            --fqbn rp2040:rp2040:rpipico2w:usbstack=tinyusb \
+            --output-dir build firmware/latency_tester
+
+      - name: Package
+        run: |
+          V="${GITHUB_REF_NAME}"
+          mkdir -p dist
+          cp build/latency_tester.ino.uf2 "dist/latency_tester_pico2w-$V.uf2"
+          mkdir -p "stage/pico-latency-tester-case-$V"
+          cp case/stl/*.stl case/latency_tester.scad LICENSE "stage/pico-latency-tester-case-$V/"
+          mkdir -p "stage/pico-latency-tester-pc-tools-$V"
+          cp pc/* LICENSE "stage/pico-latency-tester-pc-tools-$V/"
+          cd stage && for d in */; do zip -qr "../dist/${d%/}.zip" "$d"; done
+          ls -l ../dist
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "Pico Latency Tester $GITHUB_REF_NAME" \
+            --notes-file .github/release-notes.md

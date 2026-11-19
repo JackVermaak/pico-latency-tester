@@ -1,5 +1,9 @@
 # Pico Latency Tester
 
+[![build](https://github.com/JackVermaak/pico-latency-tester/actions/workflows/build.yml/badge.svg)](https://github.com/JackVermaak/pico-latency-tester/actions/workflows/build.yml)
+[![release](https://img.shields.io/github/v/release/JackVermaak/pico-latency-tester)](https://github.com/JackVermaak/pico-latency-tester/releases/latest)
+[![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
 Measures **click-to-photon latency**: the time from a mouse click to the moment the screen changes. That covers USB, Windows, the game or app, the GPU and the monitor.
 
 The Pico acts as a 1000 Hz USB mouse. For each sample it reads the screen brightness, sends a left click, starts a microsecond timer and watches a light sensor held against the monitor until the brightness changes. A run is 100 samples, with random gaps so the clicks do not line up with the refresh rate. The OLED shows the live result. Every sample also goes over USB serial, so `pc/latency_log.py` can save it to CSV.
@@ -97,7 +101,9 @@ openscad -D 'part="box"' -o stl/box.stl latency_tester.scad
 
 ## Flashing the firmware
 
-**Easy way:** hold BOOTSEL and plug the Pico into the PC. Drag `firmware/latency_tester_pico2w.uf2` onto the `RP2350` drive that appears. It reboots into the tester.
+**Easy way:** download the `.uf2` from the [latest release](https://github.com/JackVermaak/pico-latency-tester/releases/latest) (or use `firmware/latency_tester_pico2w.uf2`). Hold BOOTSEL and plug the Pico into the PC, then drag the file onto the `RP2350` drive that appears. It reboots into the tester.
+
+Every push is compiled with arduino-cli by GitHub Actions, and the release `.uf2` is built by CI from the tagged source.
 
 **Arduino IDE (to change settings):**
 1. Boards Manager URL: `https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json`, then install **Raspberry Pi Pico/RP2040/RP2350** (built and tested with 6.3.1).
