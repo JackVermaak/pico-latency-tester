@@ -2,7 +2,7 @@
 
 Measures **click-to-photon latency**: the time from a mouse click to the moment the screen changes. That covers USB, Windows, the game or app, the GPU and the monitor.
 
-The Pico acts as a 1000 Hz USB mouse. For each sample it reads the screen brightness, sends a left click, starts a microsecond timer and watches a light sensor stuck to the monitor until the brightness changes. A run is 100 samples, with random gaps so the clicks don't line up with the refresh rate. The OLED shows the live result. Every sample also goes over USB serial, so `pc/latency_log.py` can save it to CSV.
+The Pico acts as a 1000 Hz USB mouse. For each sample it reads the screen brightness, sends a left click, starts a microsecond timer and watches a light sensor held against the monitor until the brightness changes. A run is 100 samples, with random gaps so the clicks do not line up with the refresh rate. The OLED shows the live result. Every sample also goes over USB serial, so `pc/latency_log.py` can save it to CSV.
 
 ![Pico Latency Tester case](case/preview/assembly.png)
 
@@ -63,7 +63,7 @@ The Pico sits **upside down** in the box (header pins pointing up), so the pin l
 ```
 
 Notes:
-- **The sensor runs from GP27**, which the firmware drives high. It draws well under 1 mA, so it's fine, and its three wires land on three neighbouring pins (31–33). AGND is the quiet analog ground, which gives cleaner readings.
+- **The sensor runs from GP27**, which the firmware drives high. It draws well under 1 mA, so this is safe, and its three wires land on three neighbouring pins (31–33). AGND is the quiet analog ground, which gives cleaner readings.
 - **Wire the OLED by the labels printed on the module.** VCC and GND swap places between batches.
 - **Sensor lead (about 35 cm):** for each of the three lines, join two jumpers end to end (one with a plug left on, one with both plugs cut off), soldered under heat shrink. Push the bare ends through the sensor pads from the back of the board, solder on the front and trim flush so the board sits flat in the cup. Twist the three wires loosely together. Before gluing anything, plug the lead in and check that covering the sensor makes the light level on the OLED drop.
 - **Switch:** cut two jumpers about 3 cm from one end and solder those ends to the switch legs.
@@ -91,8 +91,8 @@ openscad -D 'part="box"' -o stl/box.stl latency_tester.scad
 2. **Pico:** set it upside down on the four posts, USB socket toward the hole in the left wall. The two thin pegs at the USB end locate it. Screw the far end down with 2× M2×6.
 3. **Switch:** snap the MX switch into the lid from the top and fit the keycap.
 4. **OLED:** turn the lid over and lay the module in its pocket, glass toward the window and pins toward the back. Hold it with the clamp and 2× M2×6, snug but not tight: the glass cracks easily.
-5. **Sensor:** push the breakout into the sensor cup, sensor side toward the slot window. Glue it if it's loose. Feed the lead in through the notch at the top of the back wall.
-6. **Plug in** all jumpers as in the wiring table. Tuck the wires to the sides so they don't press on the OLED.
+5. **Sensor:** push the breakout into the sensor cup, sensor side toward the slot window. Glue it in place if it is loose. Feed the lead in through the notch at the top of the back wall.
+6. **Plug in** all jumpers as in the wiring table. Tuck the wires to the sides so they do not press on the OLED.
 7. **Close** the lid with 4× M2×10 and stick the four feet into the recesses underneath.
 
 ## Flashing the firmware
@@ -102,7 +102,7 @@ openscad -D 'part="box"' -o stl/box.stl latency_tester.scad
 **Arduino IDE (to change settings):**
 1. Boards Manager URL: `https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json`, then install **Raspberry Pi Pico/RP2040/RP2350** (built and tested with 6.3.1).
 2. Library Manager: **Adafruit SSD1306** (installs Adafruit GFX too).
-3. Board: **Raspberry Pi Pico 2W**. Tools → USB Stack: **Adafruit TinyUSB** (required; it's what gives the 1 ms polling).
+3. Board: **Raspberry Pi Pico 2W**. Tools → USB Stack: **Adafruit TinyUSB** (required, as it provides the 1 ms polling).
 4. Open `firmware/latency_tester/latency_tester.ino`; the code itself is in the `tester.cpp` tab. Settings are at the top.
 
 The tester is Arduino rather than CircuitPython on purpose: CircuitPython's USB HID polls every 8 ms, which would add up to 8 ms of jitter to every sample. With TinyUSB at 1 ms, the tester adds less than 1 ms.
@@ -118,7 +118,7 @@ The tester is Arduino rather than CircuitPython on purpose: CircuitPython's USB 
 
 ### In a game (e.g. CS2)
 - Find something that changes brightness the instant you click: the muzzle flash, or a dark wall that lights up when you fire. Put the sensor there. Bigger brightness changes give cleaner triggers.
-- Use an offline map with infinite ammo (`sv_cheats 1; sv_infinite_ammo 1`) so a run of 100 shots doesn't need reloads.
+- Use an offline map with infinite ammo (`sv_cheats 1; sv_infinite_ammo 1`) so a run of 100 shots does not need reloads.
 - Change **one** thing per run (Reflex on/off, fullscreen vs windowed, frame cap, refresh rate) and label each run.
 
 ### Logging on the PC
@@ -140,7 +140,7 @@ Serial commands (any terminal, 115200 baud): `s` start, `x` stop, `l` print the 
 ### Reading the numbers
 - Use the **median** to compare setups, since the mean is pulled up by outliers.
 - A 144 Hz monitor alone adds 0–7 ms depending on where in the refresh the click lands, so expect a spread.
-- The result includes the monitor's own pixel response, which is the true end-to-end figure. It's what you see, so it's what matters.
+- The result includes the monitor's own pixel response, which is the true end-to-end figure. It reflects what the user actually sees, which is the figure that matters.
 
 ## Troubleshooting
 
